@@ -52,6 +52,8 @@ One also need to install git on the server and clone the [Nexus-OSS-Installation
 
 ## Deployment of Docker Repositories in Nexus
 
+![GitHub Logo](/images/docker-private.png)
+
 ## Installation and Configuration of Apache Reverse Proxy
 
 ## Testing of the Setup
