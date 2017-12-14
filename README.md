@@ -52,7 +52,22 @@ One also need to install git on the server and clone the [Nexus-OSS-Installation
 
 ## Deployment of Docker Repositories in Nexus
 
+The default nexus admin credentials are Username: `admin` Password: `admin123`, one need to browse to `Server Administration and Configuration` section, afterwards create blobs for repositories.
+Creating blob store for private docker repository, `Type: File`, `Name: docker-private`, `Path: docker-private`. 
+
 ![GitHub Logo](/images/docker-private.png)
+
+Creating blob store for docker repository proxy, `Type: File`, `Name: docker-proxy`, `Path: docker-proxy`. 
+
+![GitHub Logo](/images/docker-proxy.png)
+
+Creating blob store for docker repository group, `Type: File`, `Name: docker-group`, `Path: docker-group`. 
+
+![GitHub Logo](/images/docker-group.png)
+
+Eventually the list of the blob stores for docker should look like this
+
+![GitHub Logo](/images/docker-blobs.png)
 
 ## Installation and Configuration of Apache Reverse Proxy
 
