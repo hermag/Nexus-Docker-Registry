@@ -54,30 +54,34 @@ One also need to install git on the server and clone the [Nexus-OSS-Installation
 
 ### Creation of Blobs
 
-The default nexus admin credentials are `Username: admin`, `Password: admin123`, one need to browse to `Server Administration and Configuration` section, afterwards create blobs for repositories.
+The default admin credentials for nexus are `Username: admin`, `Password: admin123`, one need to browse to `Server Administration and Configuration` section, afterwards create blobs for repositories.
 Creating blob store for private docker repository, `Type: File`, `Name: docker-private`, `Path: docker-private`. 
 
-![GitHub Logo](/images/docker-private.png)
+![Docker blob private](/images/docker-private.png)
 
 Creating blob store for docker repository proxy, `Type: File`, `Name: docker-proxy`, `Path: docker-proxy`. 
 
-![GitHub Logo](/images/docker-proxy.png)
+![Docker blob proxy](/images/docker-proxy.png)
 
 Creating blob store for docker repository group, `Type: File`, `Name: docker-group`, `Path: docker-group`. 
 
-![GitHub Logo](/images/docker-group.png)
+![Docker blob group](/images/docker-group.png)
 
 Eventually the list of the blob stores for docker should look like this ...
 
-![GitHub Logo](/images/docker-blobs.png)
+![Blobs for Docker](/images/docker-blobs.png)
 
 ### Creation of Repositories
 Important note: docker daemon relies on secure communication (over SSL) to the docker registry, i.e. we need to configure Nexus docker repositories to provide the service over `HTTPS`. OSS Nexus, provides two options for having the docker registry over `HTTPS`:
 
-1. Configure the Nexus itselve using the `Java KeyTools`
+1. Configure the Nexus itself using the `Java KeyTools`
 2. Configure the reverse proxy web server and transfer the communication to Nexus repositories over it.
 
-Usage of `Java KeyTools` without official `DNS` entry and without CA server is cumbersome and error prone, therefore I've decided to go for the second option, i.e. reverse proxy configuration of web server. 
+Usage of `Java KeyTools` without official `DNS` entry and without `CA` server is cumbersome and error prone, therefore I've decided to go for the second option, i.e. reverse proxy configuration of web server. Before description of apache reverse proxy configuration, I will shortly describe the options during the creation of repositories. Important point here is the usage of `http ports` instead of creation of `https connectors`, this fact simplifies overall process and it is possible because of web server reverse proxy.
+
+Going to `Repositories` from `Blobs` in the left hand menu, I am creating the `docker-priv` repository
+
+![Docker Priv Repo](/images/docker-priv-repository.png)
 
 
 ## Installation and Configuration of Apache Reverse Proxy
