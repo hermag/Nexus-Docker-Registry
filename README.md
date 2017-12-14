@@ -205,6 +205,8 @@ systemctl start httpd
 
 If `httpd` and `nexus` daemons are running without issues, we can go to the next step, which means pushing and pulling of docker images from and to the `docker-priv` repository.
 
+(One can use the following [link](https://wiki.centos.org/HowTos/Https) for crosschecking the `https` installation.)
+
 ## Testing of the Setup
 
 
