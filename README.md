@@ -118,7 +118,7 @@ Here are the most important fields that should be filled:
 - Group `Member repositories: Members` -> `docker-priv, docker-proxy`
 
 ![Docker Group Repo 1](/images/docker-group-repo-1.png)
-![Docker Group Repo 2](/images/docker-group-repo-1.png)
+![Docker Group Repo 2](/images/docker-group-repo-2.png)
 
 
 
