@@ -83,6 +83,12 @@ Going to `Repositories` from `Blobs` in the left hand menu, I am creating the `d
 
 ![Docker Priv Repo](/images/docker-priv-repository.png)
 
+Here are the most important fields that should be filled:
+- `Name: docker-priv`
+- `Format: docker` (when creating the repository one should select type `docker (hosted)` as it is shown below)
+![Nexus Repository Types](/images/nexus-repository-types.png)
+- `HTTP (Create an HTTP connector at specified port. Normally used if the server is behind a secure proxy.) : 8082`
+- Storage `Blob Store: docker-private`
 
 ## Installation and Configuration of Apache Reverse Proxy
 
