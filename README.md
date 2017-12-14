@@ -120,7 +120,15 @@ Here are the most important fields that should be filled:
 ![Docker Group Repo 1](/images/docker-group-repo-1.png)
 ![Docker Group Repo 2](/images/docker-group-repo-2.png)
 
+Since, it is planned to use the following TCP ports `8081, 8082, 8083, 8084` the firewalld should be configured correspondingly, i.e.
 
+```
+firewall-cmd --permanent --add-port=8081/tco
+firewall-cmd --permanent --add-port=8082/tcp
+firewall-cmd --permanent --add-port=8083/tcp
+firewall-cmd --permanent --add-port=8084/tcp
+firewall-cmd --reload
+```
 
 ## Installation and Configuration of Apache Reverse Proxy
 
