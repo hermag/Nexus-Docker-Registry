@@ -124,6 +124,7 @@ Since, it is planned to use the following TCP ports `8081, 8082, 8083, 8084` the
 
 ```
 firewall-cmd --permanent --add-port={8081/tcp,8082/tcp,8083/tcp,8084/tcp}
+
 firewall-cmd --reload
 ```
 
@@ -149,6 +150,23 @@ openssl genrsa -out priv.key 2048
 openssl req -new -key priv.key -out priv.csr
 
 openssl x509 -req -days 365 -in priv.csr -signkey priv.key -out priv.crt
+
+cp priv.crt /etc/pki/tls/certs/
+
+cp priv.key /etc/pki/tls/private/
+
+cp priv.csr /etc/pki/tls/private/
+
+
+firewall-cmd --permanent --add-port={80/tcp,443/tcp}
+
+firewall-cmd --permanent --add-service=http --add-service=https
+
+firewall-cmd --reload
+
+systemctl enable httpd
+
+systemctl start httpd
 ```
 
 For configuration, check the [ssl.conf](https://github.com/hermag/Nexus-Docker-Registry/blob/master/ssl.conf) file, particularly the  
