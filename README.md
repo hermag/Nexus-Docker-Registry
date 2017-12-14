@@ -127,9 +127,31 @@ firewall-cmd --permanent --add-port={8081/tcp,8082/tcp,8083/tcp,8084/tcp}
 firewall-cmd --reload
 ```
 
-
-
 ## Installation and Configuration of Apache Reverse Proxy
+
+Docker repositories are created in OSS Nexus, now it's time to install and configure apache reverse proxy server, which will transfer requests to `docker-priv` over `https`. Repositories, `docker-group` can be used in combination with `docker pull` and `docker push` commands, `docker-proxy` can be used for synchronization of docker images and speedup deployments.
+
+### Installation of Apache Server
+
+`yum install httpd mod_ssl openssl -y`
+
+Disable `SELinux` on host and reboot it, reason for this decision is the unregistered DNS and CA and also tackle with SELinux policies configuration and making all apache related activities trusted. Since it's just a blue print, disabling of SELinux is just for shortening the deployment time. In general it is strongly NOT recommended to switch SELinux from `enforcing` mode to any other.
+
+### Generating the self-signed certificates
+
+On nexus server
+
+```
+cd /opt
+
+openssl genrsa -out priv.key 2048
+
+openssl req -new -key priv.key -out priv.csr
+
+openssl x509 -req -days 365 -in priv.csr -signkey priv.key -out priv.crt
+```
+
+For configuration, check the [ssl.conf](https://github.com/hermag/Nexus-Docker-Registry/blob/master/ssl.conf) file, particularly the  
 
 ## Testing of the Setup
 
