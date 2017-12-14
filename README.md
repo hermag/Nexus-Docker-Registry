@@ -52,7 +52,7 @@ One also need to install git on the server and clone the [Nexus-OSS-Installation
 
 ## Deployment of Docker Repositories in Nexus
 
-###Creation of Blobs
+### Creation of Blobs
 
 The default nexus admin credentials are `Username: admin`, `Password: admin123`, one need to browse to `Server Administration and Configuration` section, afterwards create blobs for repositories.
 Creating blob store for private docker repository, `Type: File`, `Name: docker-private`, `Path: docker-private`. 
@@ -71,7 +71,7 @@ Eventually the list of the blob stores for docker should look like this ...
 
 ![GitHub Logo](/images/docker-blobs.png)
 
-###Creation of Repositories
+### Creation of Repositories
 Important note: docker daemon relies on secure communication (over SSL) to the docker registry, i.e. we need to configure Nexus docker repositories to provide the service over `HTTPS`. OSS Nexus, provides two options for having the docker registry over `HTTPS`:
 
 1. Configure the Nexus itselve using the `Java KeyTools`
