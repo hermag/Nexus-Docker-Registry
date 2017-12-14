@@ -1,10 +1,10 @@
 # Nexus Docker Registry on CentOS 7
 
 My goal was deployment of the the private [docker registry](https://help.sonatype.com/display/NXRM3/Private+Registry+for+Docker) on [OSS Nexus](https://www.sonatype.com/nexus-repository-oss). Since what I am describing here can be used as a blueprint for the larger scale deployments, I was doing few shortcuts, specifically: 
-### I was doing everything using the KVM libvirt virtualized VMs, where hypervizor was my laptop and nothing else, hence I was limited in resources.
-### I was using `/etc/hosts` entries instead of DNS resolution,
-### I was generating self signed certificates, i.e. I didn't use any CA certificate,
-### Entire deployment has been done behind the NAT in the libvirt KVM network `192.168.122.0/24`
+- I was doing everything using the KVM libvirt virtualized VMs, where hypervizor was my laptop and nothing else, hence I was limited in resources.
+- I was using `/etc/hosts` entries instead of DNS resolution,
+- I was generating self signed certificates, i.e. I didn't use any CA certificate,
+- Entire deployment has been done behind the NAT in the libvirt KVM network `192.168.122.0/24`
 
 I was looking for the clear `howto` on deployment of docker registry on OSS Nexus, without [Java Keytool](https://www.sslshopper.com/article-most-common-java-keytool-keystore-commands.html) and some standard things. I didn't manage to find any so I am providing this in hope that it will be useful for those who just wants to play around with OSS Nexus and it's docker registry capabilities. 
 
@@ -31,10 +31,10 @@ tmpfs                          581M     0  581M   0% /run/user/0
 Hostname of the server, `nexus.test.net`, IP `192.168.122.154`, network `/24`.
 
 This is the sequence of steps I need to do for deployment of the private OSS Nexus Docker Registry:
-### Deployment of OSS Nexus server [Nexus-OSS-Installation](https://github.com/hermag/Nexus-OSS-Installation);
-### Creating in OSS Nexus the private, proxy and group docker repositories with corresponding ports;
-### Installation of Apache web server and it's configuration as (SSL) reverse proxy for OSS Nexus private doker repository.
-### Testing of deployment.
+- Deployment of OSS Nexus server [Nexus-OSS-Installation](https://github.com/hermag/Nexus-OSS-Installation);
+- Creating in OSS Nexus the private, proxy and group docker repositories with corresponding ports;
+- Installation of Apache web server and it's configuration as (SSL) reverse proxy for OSS Nexus private doker repository.
+- Testing of deployment.
 
 Let's get started.
 
