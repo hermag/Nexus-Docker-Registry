@@ -90,6 +90,23 @@ Here are the most important fields that should be filled:
 - `HTTP (Create an HTTP connector at specified port. Normally used if the server is behind a secure proxy.) : 8082`
 - Storage `Blob Store: docker-private`
 
+Creating repository `docker-proxy`
+
+![Docker Priv Repo](/images/docker-priv-repository.png)
+
+Here are the most important fields that should be filled:
+- `Name: docker-proxy`
+- `Format: docker` (when creating the repository one should select type `docker (proxy)` as it has been shown)
+- `HTTP (Create an HTTP connector at specified port. Normally used if the server is behind a secure proxy.) : 8083`
+- Proxy `Remote Storage (Location of the remote repository being proxied): https://registry-1.docker.io`
+- `Docker Index: Use Docker Hub`
+- Storage `Blob Store (Blob store used to store asset contents): docker-proxy`
+
+![Docker Proxy Repo 1](/images/docker-proxy-repo-1.png)
+![Docker Proxy Repo 2](/images/docker-proxy-repo-2.png)
+![Docker Proxy Repo 3](/images/docker-proxy-repo-3.png)
+
+
 ## Installation and Configuration of Apache Reverse Proxy
 
 ## Testing of the Setup
