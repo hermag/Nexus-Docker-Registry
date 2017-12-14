@@ -138,6 +138,8 @@ Docker repositories are created in OSS Nexus, now it's time to install and confi
 
 Disable `SELinux` on host and reboot it, reason for this decision is the unregistered DNS and CA and also tackle with SELinux policies configuration and making all apache related activities trusted. Since it's just a blue print, disabling of SELinux is just for shortening the deployment time. In general it is strongly NOT recommended to switch SELinux from `enforcing` mode to any other.
 
+If apache server was already installed, just check if the `mod_ssl` module is installed, e.g. if output of `httpd -M | grep ssl` is `ssl_module (shared)`, then module is there. 
+
 ### Generating the self-signed certificates
 
 On nexus server
@@ -150,26 +152,58 @@ openssl genrsa -out priv.key 2048
 openssl req -new -key priv.key -out priv.csr
 
 openssl x509 -req -days 365 -in priv.csr -signkey priv.key -out priv.crt
+```
 
+Generation of key and certificate has been done, now we need to copy them in a proper place, i.e.
+
+```
 cp priv.crt /etc/pki/tls/certs/
 
 cp priv.key /etc/pki/tls/private/
 
 cp priv.csr /etc/pki/tls/private/
+```
 
+Now it is important to enable ports and services in `firewalld`, i.e. 
 
+```
 firewall-cmd --permanent --add-port={80/tcp,443/tcp}
 
 firewall-cmd --permanent --add-service=http --add-service=https
 
 firewall-cmd --reload
+```
 
+Now, for proper configuration of apache and revers proxy, check the [ssl.conf](https://github.com/hermag/Nexus-Docker-Registry/blob/master/ssl.conf) file, particularly the following sections
+
+```
+# General setup for the virtual host, inherited from global configuration
+DocumentRoot "/var/www/html"
+
+ServerName nexus.test.net:443
+```
+
+Make sure that `nexus.test.net` is accordingly changed, also make sure that `SSLCertificateFile` and `SSLCertificateKeyFile` are pointing to the existing location of the certificate and key files.
+
+This is an example of revers proxy configuration:
+
+```
+ProxyPass / http://localhost:8082/
+
+ProxyPassReverse / http://localhost:8082/
+
+RequestHeader set X-Forwarded-Proto "https"
+```
+
+Which means that `https://nexus.test.net` will point to the `docker-priv` repository (check which port has been opened for `docker-priv` repository.). Once it's done, we can enable and start the apache server.
+
+```
 systemctl enable httpd
 
 systemctl start httpd
 ```
 
-For configuration, check the [ssl.conf](https://github.com/hermag/Nexus-Docker-Registry/blob/master/ssl.conf) file, particularly the  
+If `httpd` and `nexus` daemons are running without issues, we can go to the next step, which means pushing and pulling of docker images from and to the `docker-priv` repository.
 
 ## Testing of the Setup
 
