@@ -6,7 +6,7 @@ Markup :	* I was doing everything using the KVM libvirt virtualized VMs, where h
 			* I was generating self signed certificates, i.e. I didn't use any CA certificate,
 			* Entire deployment has been done behind the NAT in the libvirt KVM network `192.168.122.0/24`
 
-I was looking for the clear `howto` on deployment of docker registry on OSS Nexus, without Java Keytool` (https://www.sslshopper.com/article-most-common-java-keytool-keystore-commands.html) and some standard things. I didn't manage to find any so I am providing this in hope that it will be useful for those who just wants to play around with OSS Nexus and it's docker registry capabilities. 
+I was looking for the clear `howto` on deployment of docker registry on OSS Nexus, without [Java Keytool](https://www.sslshopper.com/article-most-common-java-keytool-keystore-commands.html) and some standard things. I didn't manage to find any so I am providing this in hope that it will be useful for those who just wants to play around with OSS Nexus and it's docker registry capabilities. 
 
 Parameters of OSS Nexus server VM.
 
