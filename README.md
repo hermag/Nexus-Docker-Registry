@@ -59,7 +59,7 @@ One also need to install git on the server and clone the [Nexus-OSS-Installation
 
 [Erekle Magradze](http://magradze.web.cern.ch/magradze/)
 
-# პირადი OSS NEXUS Docker იმიჯების სანახი CentOS 7-ზე
+# Docker იმიჯების პირადი სანახი OSS NEXUS-ში, CentOS 7-ზე
 
 სერვერის პარამეტრები, რომელზეც ყენდება OSS NEXUS.
 
