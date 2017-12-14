@@ -87,16 +87,16 @@ Here are the most important fields that should be filled:
 - `Name: docker-priv`
 - `Format: docker` (when creating the repository one should select type `docker (hosted)` as it is shown below)
 ![Nexus Repository Types](/images/nexus-repository-types.png)
+- `Type: hosted`
 - `HTTP (Create an HTTP connector at specified port. Normally used if the server is behind a secure proxy.) : 8082`
 - Storage `Blob Store: docker-private`
 
 Creating repository `docker-proxy`
 
-![Docker Priv Repo](/images/docker-priv-repository.png)
-
 Here are the most important fields that should be filled:
 - `Name: docker-proxy`
 - `Format: docker` (when creating the repository one should select type `docker (proxy)` as it has been shown)
+- `Type: proxy`
 - `HTTP (Create an HTTP connector at specified port. Normally used if the server is behind a secure proxy.) : 8083`
 - Proxy `Remote Storage (Location of the remote repository being proxied): https://registry-1.docker.io`
 - `Docker Index: Use Docker Hub`
@@ -105,6 +105,22 @@ Here are the most important fields that should be filled:
 ![Docker Proxy Repo 1](/images/docker-proxy-repo-1.png)
 ![Docker Proxy Repo 2](/images/docker-proxy-repo-2.png)
 ![Docker Proxy Repo 3](/images/docker-proxy-repo-3.png)
+
+Creating repository `docker-group`
+
+Here are the most important fields that should be filled:
+- `Name: docker-group`
+- `Format: docker` (when creating the repository one should select type `docker (group)` as it has been shown)
+- `Type: group`
+- `HTTP (Create an HTTP connector at specified port. Normally used if the server is behind a secure proxy.) : 8084`
+- Proxy `Remote Storage (Location of the remote repository being proxied): https://registry-1.docker.io`
+- Storage `Blob Store (Blob store used to store asset contents): docker-group`
+- Group `Member repositories: Members` -> `docker-priv, docker-proxy`
+
+![Docker Proxy Repo 1](/images/docker-proxy-repo-1.png)
+![Docker Proxy Repo 2](/images/docker-proxy-repo-2.png)
+![Docker Proxy Repo 3](/images/docker-proxy-repo-3.png)
+
 
 
 ## Installation and Configuration of Apache Reverse Proxy
