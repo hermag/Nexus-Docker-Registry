@@ -212,7 +212,7 @@ In order to use the newly installed registry we need to trust the self signed ce
 
 ### Ubuntu
 
-Creat the `nexus-docker-repo` folder for copying the certificates `sudo mkdir /usr/share/ca-certificates/test`.
+Create the `nexus-docker-repo` folder for copying the certificates `sudo mkdir /usr/share/ca-certificates/test`.
 
 Copy the self signed certificate to the newly created folder `sudo cp priv.crt /usr/share/ca-certificates/test/`.
 
@@ -422,19 +422,20 @@ firewall-cmd --reload
 
 ## Apache Reverse Proxy ვებ სერვერის დაყენება და კონფიგურაცია
 
-Docker repositories are created in OSS Nexus, now it's time to install and configure apache reverse proxy server, which will transfer requests to `docker-priv` over `https`. Repositories, `docker-group` can be used in combination with `docker pull` and `docker push` commands, `docker-proxy` can be used for synchronization of docker images and speedup deployments.
+ამ ეტაპზე docker რეპოზიტორიები შექმნილია, ახლა საჭიროა დავაყენოთ და დავაკონფიგურიროთ ვებ სერვერი რომელიც "რევერსულად გაპროქსავს" `docker-priv`-კენ მიმავალ ტრაფიკს. 
 
 ### Apache Server ვებ სერვერის დაყენება
 
 `yum install httpd mod_ssl openssl -y`
 
-Disable `SELinux` on host and reboot it, reason for this decision is the unregistered DNS and CA and also tackle with SELinux policies configuration and making all apache related activities trusted. Since it's just a blue print, disabling of SELinux is just for shortening the deployment time. In general it is strongly NOT recommended to switch SELinux from `enforcing` mode to any other.
 
-If apache server was already installed, just check if the `mod_ssl` module is installed, e.g. if output of `httpd -M | grep ssl` is `ssl_module (shared)`, then module is there. 
+ზოგადად `SELinux` გათიშვა არ არის რეკომენდირებული, მაგრამ ამ ეტაპზე ჩვენი მიზანია რომ გავმართოთ პირადი დოკერ რეგისტრი და თან რაც შეიძლება სწრაფად და უმტკივნეულოდ, უმჯობესია გავაკეთოთ `SELinux`-ის დეაქტივაცია. რეალურ სამუშაო გარემოშიც, დიდი ალბათობით ნექსუსის სერვერი იქნება დაცული ქსელის შიგნით და `SELinux`-ის დეაქტივაცია არ უნდა წარმოადგენდეს დიდ პრობლემას. თუმცა უსაფრთხოების მიზნით, რეალურ გარემოში მაინც აჯობებს დახარჯოთ ცოტა დრო და გაწეროთ შესაბამისი `SELinux` წესები. 
+
+შენიშვნა: თუ აპაჩი ვებ სერვერ უკვე დაყენებული გაქვთ მაშინ გადაამოწმეთ გიყენიათ თუ არა `mod_ssl` მოდული, რაც მარტივად ასე შეგიძლიათ გააკეთოთ, თუ `httpd -M | grep ssl`-ის შედეგად დაინახავთ შემდეგს `ssl_module (shared)`ესე იგი მოდული აყენია. 
 
 ### ლოკალური (self-signed) სერტიფიკატების გენერაცია
 
-On nexus server
+ნექსუსის სერვერზე, ვასრულებთ შემდეგ ბრძანებებს
 
 ```
 cd /opt
@@ -446,7 +447,7 @@ openssl req -new -key priv.key -out priv.csr
 openssl x509 -req -days 365 -in priv.csr -signkey priv.key -out priv.crt
 ```
 
-Generation of key and certificate has been done, now we need to copy them in a proper place, i.e.
+შედეგად დაგენერირდა `priv.key` გასაღები და `priv.crt` სერტიფიკატი, ახლა კი საჭიროა მათი გადაკოპირება შესაბამის ადგილზე,
 
 ```
 cp priv.crt /etc/pki/tls/certs/
@@ -456,7 +457,7 @@ cp priv.key /etc/pki/tls/private/
 cp priv.csr /etc/pki/tls/private/
 ```
 
-Now it is important to enable ports and services in `firewalld`, i.e. 
+შემდეგი ნაბიჯია სათანადო პორტების გახსნა `firewalld`-ში, 
 
 ```
 firewall-cmd --permanent --add-port={80/tcp,443/tcp}
@@ -466,7 +467,7 @@ firewall-cmd --permanent --add-service=http --add-service=https
 firewall-cmd --reload
 ```
 
-Now, for proper configuration of apache and revers proxy, check the [ssl.conf](https://github.com/hermag/Nexus-Docker-Registry/blob/master/ssl.conf) file, particularly the following sections
+აპაჩი ვებ სერვერის რევერსულ პროქსიდ დასაკონფიგურირებლად საჭიროა შემდეგი საკონფიგურაციო ფაილის [ssl.conf](https://github.com/hermag/Nexus-Docker-Registry/blob/master/ssl.conf) გააზრება, კერძოდ კი ყურადღება მიაქციეთ შემდეგს,
 
 ```
 # General setup for the virtual host, inherited from global configuration
@@ -475,9 +476,9 @@ DocumentRoot "/var/www/html"
 ServerName nexus.test.net:443
 ```
 
-Make sure that `nexus.test.net` is accordingly changed, also make sure that `SSLCertificateFile` and `SSLCertificateKeyFile` are pointing to the existing location of the certificate and key files.
+აქ `nexus.test.net` არის ნექსუსის სერვერის სახელი, შესაბამისად ეს უნდა შეცვალოთ იმის მიხედვით თუ რა ქვია თქვენს ნექსუს სერვერს, ასევე დარწმნუდით რომ `SSLCertificateFile` და `SSLCertificateKeyFile` მიუთითებენ შესაბამისად სერტიფიკატის და გასაღების ფაილების სრულ მისამართს ფაილურ სისტემაში.
 
-This is an example of revers proxy configuration:
+ფაილის ბოლოს კი ვამატებთ, რევერსული პროქსის კონფიგურაციას, მაგალითად:
 
 ```
 ProxyPass / http://localhost:8082/
@@ -487,7 +488,9 @@ ProxyPassReverse / http://localhost:8082/
 RequestHeader set X-Forwarded-Proto "https"
 ```
 
-Which means that `https://nexus.test.net` will point to the `docker-priv` repository (check which port has been opened for `docker-priv` repository.). Once it's done, we can enable and start the apache server.
+რაც ნიშნავს რომ `https://nexus.test.net`-ზე მოსული ტრაფიკი გადამისამართდება `docker-priv` რეპოზიტორიაზე (`docker-priv` რეპოზიტორიისთვის გავხსენით 8082 პორტი.).
+
+ვებ სერვერის კონფიგურაციის დასრულების შემდეგ შეგვიძლია მისი გააქტიურება და ჩართვა.
 
 ```
 systemctl enable httpd
@@ -495,13 +498,14 @@ systemctl enable httpd
 systemctl start httpd
 ```
 
-If `httpd` and `nexus` daemons are running without issues, we can go to the next step, which means pushing and pulling of docker images from and to the `docker-priv` repository.
+თუ ამ ეტაპამდე უხარვეზოდ მოხვედით და `httpd`, `nexus` სერვისები მუშაობენ, ჩვენ შეგვიძლია გადავიდეთ შემდეგ ეტაპზე და შევამოწმოთ თუ როგორ მუშაობს დოკერ იმიჯების მოაქჩვა და `docker-priv` რეპოზიტორიაში ატვირთვა.
 
-(One can use the following [link](https://wiki.centos.org/HowTos/Https) for crosschecking the `https` installation.)
+(აპაჩი ვებ სერვერის `https`-ის კონფიგურაციის გადასამოწმებლად შეგიძლია გაყვეთ ამ [ბმულს](https://wiki.centos.org/HowTos/Https).)
 
 ## გამართული სისტემის შემოწმება
 
 In order to use the newly installed registry we need to trust the self signed certificate, below are the instructions for Ubuntu and for CentOS.
+იმისათვის რომ შეძლოთ `docker-priv` რეპოზიტორიის გამოყენება თქვენი მიზნებისთვის აუცილებელია რომ დაგენერირებული სერტიფიკატი დაამატოთ სანდო სერტიფიკატების სიაში, ქვემოთ მოყვანილია ამ პროცესის აღწერა Ubuntu-სა და CentOS-თვის.
 
 ### Ubuntu
 
