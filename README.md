@@ -212,7 +212,7 @@ In order to use the newly installed registry we need to trust the self signed ce
 
 ### Ubuntu
 
-Create the `nexus-docker-repo` folder for copying the certificates `sudo mkdir /usr/share/ca-certificates/test`.
+Create the `test` folder for copying the certificates `sudo mkdir /usr/share/ca-certificates/test`.
 
 Copy the self signed certificate to the newly created folder `sudo cp priv.crt /usr/share/ca-certificates/test/`.
 
@@ -509,34 +509,44 @@ In order to use the newly installed registry we need to trust the self signed ce
 
 ### Ubuntu
 
-Creat the `nexus-docker-repo` folder for copying the certificates `sudo mkdir /usr/share/ca-certificates/test`.
+ შექმენით `test` საქაღალდე certificates `sudo mkdir /usr/share/ca-certificates/test`.
 
-Copy the self signed certificate to the newly created folder `sudo cp priv.crt /usr/share/ca-certificates/test/`.
+გადააკოპირეთ ვებ სერვერისთვის დაგენერირებული სერტიფიკატი შექმნილ საქაღალდეში `sudo cp priv.crt /usr/share/ca-certificates/test/`.
 
-Import and trust the certificate, `sudo dpkg-reconfigure ca-certificates`
+დააიმპორტეთ სერტიფიკატი, `sudo dpkg-reconfigure ca-certificates`
 
-Select `Yes` in order to agree on trusting new certificate,
+აირჩიეთ `Yes` რათა გადახვიდეთ ახალი სერტიფიკატის დამატების რეჟიმში,
 
 ![Trust cert 1](/images/add-certificate-1.png)
 
-Scroll down and select `test/ca.crt` in my case, `ca.crt` is the name of the new certificate instead of `priv.crt`.
+ჩამოდით ქვემოთ და ხარვეზზე(space)-ზე დაჭერით მონიშნეთ `test/ca.crt`, (ჩემს შემთხვევაში სერტიფიკატს დავარქვი `ca.crt`, არანაირი კავშირი არ აქვს CA-თან).
 
 ![Trust cert 2](/images/add-certificate-2.png)
 
 ### CentOS
 
-Copy the `priv.crt` to `/etc/pki/ca-trust/source/anchors/` and run `update-ca-trust` it will add the new cert and update the list of trusted certificates.
+გადავაკოპიროთ `priv.crt` შემდეგ მისამართზე `/etc/pki/ca-trust/source/anchors/` და გავუშვათ `update-ca-trust` ეს ბრძანება დაამატებს სერტიფიკატს სანდო სერტიფიკატების სისტემურ რეესტრში.
 
 
 ### Docker Images მოქაჩვა და ატვირთვა
 
-First of all make sure that docker is installed and running.
+პირველ რიგში დარწმუნდით რომ დოკერი გიყენიათ სისტემაზე და გაშვებულია.
 
-Try to log in on docker registry `docker login -u admin nexus.test.net`, it should prompt for the password, which in our case would be `admin123`.
+ვცადოთ რეპოზიტორიასთან დაკავშირება `docker login -u admin nexus.test.net`, ამ ბრძანებამ უნდა მოითხოვოს კოდი, რაც ნექსუსის შემთხვევაში არის `admin123`.
 
-```One can add dedicated user in OSS Nexus, which will have all rights on docker repositories. Dedicated user can be used for docker registry related manipulations.```
+```ნექსუსი იძლევა დოკერის რეპოზიტორიებზე სრული წვდომის უფლებით, მომხმარებლის დამატების უფლებას, რაც რეკომენდირებული და ბევრად უკეთესი პრაქტიკაა. ნექსუსი რეალური გამოყენების შემთხვევაში, რეკომენდებულია ნექსუსის ერთიანი ავტორიზაციის და აუტენტიფიკაციის სისტემაში ინტეგრაცია და/ან მომხმარებლების რეპოზიტორიებზე წვდომისა და მათი მართვის სათანადო პოლიტიკების კონფიგურაცია.```
 
-If log in on docker registry was successful, one can pull the image from global docker registry
+
+ლოკალურ დოკერ რეგისტრში აუტენტიფიკაციის წარმატებით გავლის შემთხვევაში
+
+```
+[root@runner anchors]# docker login -u admin nexus.test.net
+Password: 
+Login Succeeded
+```
+
+შეგვიძლია მოვქაჩოთ დოკერის იმიჯი გლობალური რეპოზიტორიიდან,
+
 
 ```
 [root@runner ~]# docker pull nginx
@@ -549,7 +559,7 @@ Digest: sha256:2ffc60a51c9d658594b63ef5acfac9d92f4e1550f633a3a16d898925c4e7f5a7
 Status: Downloaded newer image for nginx:latest
 ```
 
-In order to push it to the registry we need to tag it accordingly
+მივანიჭოთ მას შესაბამისი tag, რათა შევძლოთ ლოკალურ რეგისტრში ატვირთვა,
 
 ```
 [root@runner ~]# docker tag nginx nexus.test.net/nginx
@@ -559,7 +569,7 @@ nginx                  latest              f895b3fb9e30        3 days ago       
 nexus.test.net/nginx   latest              f895b3fb9e30        3 days ago          108MB
 ```
 
-now we are ready to push it
+და საბოლოოდ ავტვირთოთ.
 
 ```
 [root@runner ~]# docker push nexus.test.net/nginx
@@ -570,16 +580,16 @@ The push refers to a repository [nexus.test.net/nginx]
 latest: digest: sha256:3eff18554e47c4177a09cea5d460526cbb4d3aff9fd1917d7b1372da1539694a size: 948
 ```
 
-Finally it will end up in `docker-priv` repository:
+საბოლოოდ ამ იმიჯს ვიხილავთ `docker-priv` რეპოზიტორიაში:
 
-As you can see there is a `nginx:latest` package in the repository,
+როგორც ხედავთ რეპოზიტორიაში არის `nginx:latest` იმიჯი,
 
 ![Docker image 1](/images/docker-image-1.png)
 
-Here are some more details.
+აქ კი შეგიძლიათ იხილოთ დამატებითი დეტალები.
 
 ![Docker image 2](/images/docker-image-2.png)
 
-## მორჩა!
+## სულ ეს იყო :)
 
 [ერეკლე მაღრაძე](http://magradze.web.cern.ch/magradze/)
