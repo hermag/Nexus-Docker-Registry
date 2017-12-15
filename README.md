@@ -113,7 +113,6 @@ Here are the most important fields that should be filled:
 - `Format: docker` (when creating the repository one should select type `docker (group)` as it has been shown)
 - `Type: group`
 - `HTTP (Create an HTTP connector at specified port. Normally used if the server is behind a secure proxy.) : 8084`
-- Proxy `Remote Storage (Location of the remote repository being proxied): https://registry-1.docker.io`
 - Storage `Blob Store (Blob store used to store asset contents): docker-group`
 - Group `Member repositories: Members` -> `docker-priv, docker-proxy`
 
@@ -290,8 +289,6 @@ Here are some more details.
 
 # Docker იმიჯების პირადი სანახი OSS NEXUS-ში, CentOS 7-ზე
 
-My goal was deployment of the the private [docker registry](https://help.sonatype.com/display/NXRM3/Private+Registry+for+Docker) on [OSS Nexus](https://www.sonatype.com/nexus-repository-oss). Since what I am describing here can be used as a blueprint for the larger scale deployments, I was doing few shortcuts, specifically:
-
 ამ პროექტის ფარგლებში, ჩემი მიზანი იყო შემექმნა [OSS Nexus](https://www.sonatype.com/nexus-repository-oss) გამოყენებით ლოკალური/პერსონალური [docker registry](https://help.sonatype.com/display/NXRM3/Private+Registry+for+Docker). აქ აღწერილი ინსტალაციის და კონფიგურაციის ეტაპები შეიძლება გამოყენებული იქნას უფრო დიდი ინფრასტრუქტურისთვის, ამ ეტაპზე კი აქ აღწერილია მხოლოდ ძირითად ასპექტები და ზოგგან გაკეთებული მაქვს გარკვეული დაშვებები და შემოკლებები, კერძოდ:
 
 - ინსტალაცია და კონფიგურაცია განხორციელებულია KVM libvirt ვირტუალურ მანქანაზე, სადაც ჰიპერვიზორის როლს ასრულებს ჩემი ლეპტოპი, შესაბამისად რესურსების თვალსაზრისით მაქვს გარკვეული შეზღუდვები,
@@ -367,33 +364,34 @@ This is the sequence of steps I need to do for deployment of the private OSS Nex
 ![Blobs for Docker](/images/docker-blobs.png)
 
 ### რეპოზიტორიების შექმნა
-Important note: docker daemon relies on secure communication (over SSL) to the docker registry, i.e. we need to configure Nexus docker repositories to provide the service over `HTTPS`. OSS Nexus, provides two options for having the docker registry over `HTTPS`:
 
-1. Configure the Nexus itself using the `Java KeyTools`
-2. Configure the reverse proxy web server and transfer the communication to Nexus repositories over it.
+გასათვალისწინებელია რომ docker იყენებს SSL-ს ღია თუ კერძო რეგისტრთან კომუნიკაციისთვის, შესაბამისად საჭიროა, რომ ნექსუსში შექმნილმა რეპოზიტორიამ იმუშაოს `HTTPS` გავლით, რაც შეიძლება განხორციელდეს ორნაირად: 
 
-Usage of `Java KeyTools` without official `DNS` entry and without `CA` server is cumbersome and error prone, therefore I've decided to go for the second option, i.e. reverse proxy configuration of web server. Before description of apache reverse proxy configuration, I will shortly describe the options during the creation of repositories. Important point here is the usage of `http ports` instead of creation of `https connectors`, this fact simplifies overall process and it is possible because of web server reverse proxy.
+1. ნექსუსის კონფიგურაციით `Java KeyTools`-ის გამოყენებით
+2. რევერსული ვებ სერვერის დაყენებითა და კონფიგურაციით, რომელიც `HTTPS`-ის გავლით გადაამისამართებს მოთხოვნებს დოკერის რეპოზიტორიაზე.
 
-Going to `Repositories` from `Blobs` in the left hand menu, I am creating the `docker-priv` repository
+`Java KeyTools`-ის გამოყენება როდესაც არ გვაქვს `DNS` ჩანაწერი და რომელიმე ოფიციალური `CA` სერვერის მიერ დამოწმებული სერტიფიკატი/გასაღები არის ძალზედ მოუხერხებელი და შეიძლება გარკვეულ ხარვეზებსაც გადავაწყდეთ, ამიტომ გადავწყვიტე რომ წავსულიყავი მეორე გზით. ანუ დავაკონფიგურირო რევერსული პროქსი და ჩემით დაგენერირებული სერტიფიკატი და გასაღები გამოვიყენო `HTTPS`-ის გასააქტიურებლად. საბოლოო ჯამში ეს ამარიდებს ნექსუსში, დოკერის რეპოზიტორიის შექმნისას `https connectors`-ის კონფიგურაციას და უბრალოდ გამოვიყენებ `http`-პორტსა და კონექტორს.
+
+ნექსუსის ვებ ინტერფეისზე, `Blobs`-დან გადავინაცვლოთ `Repositories`-ზე და შევქმნათ `docker-priv` რეპოზიტორია:
 
 ![Docker Priv Repo](/images/docker-priv-repository.png)
 
-Here are the most important fields that should be filled:
+ძირითადი ველები, რომელიც უნდა შევავსოთ:
 - `Name: docker-priv`
-- `Format: docker` (when creating the repository one should select type `docker (hosted)` as it is shown below)
+- `Format: docker` (რეპოზიტორიის შექმნისას, არჩევანში უნდა მოვნიშნოთ `docker (hosted)` როგორც ეს ნაჩვენებია ქვემოთ სურათზე)
 ![Nexus Repository Types](/images/nexus-repository-types.png)
 - `Type: hosted`
-- `HTTP (Create an HTTP connector at specified port. Normally used if the server is behind a secure proxy.) : 8082`
+- `HTTP (როგორც აღვნიშნე ვიყენებთ HTTP connector-ს და შესაბამისად HTTP პორტს და არა HTTPS-ს.) : 8082`
 - Storage `Blob Store: docker-private`
 
-Creating repository `docker-proxy`
+`docker-proxy` რეპოზიტორიის შექმნა
 
-Here are the most important fields that should be filled:
+ძირითადი ველები, რომელიც უნდა შევავსოთ:
 - `Name: docker-proxy`
-- `Format: docker` (when creating the repository one should select type `docker (proxy)` as it has been shown)
+- `Format: docker` (რეპოზიტორიის შექმნისას, არჩევანში უნდა მოვნიშნოთ `docker (proxy)`)
 - `Type: proxy`
-- `HTTP (Create an HTTP connector at specified port. Normally used if the server is behind a secure proxy.) : 8083`
-- Proxy `Remote Storage (Location of the remote repository being proxied): https://registry-1.docker.io`
+- `HTTP (აქაც ვიყენებთ HTTP connector, რის საშუალებასაც HTTPS რევერსული პროქსი გვაძლევს.) : 8083`
+- Proxy `Remote Storage (იმ გარე/ღია რეპოსიტორიის მისამართი რომელსაც გამოვიყენებთ იმიჯების ჩამოსატვირთად): https://registry-1.docker.io`
 - `Docker Index: Use Docker Hub`
 - Storage `Blob Store (Blob store used to store asset contents): docker-proxy`
 
@@ -401,21 +399,20 @@ Here are the most important fields that should be filled:
 ![Docker Proxy Repo 2](/images/docker-proxy-repo-2.png)
 ![Docker Proxy Repo 3](/images/docker-proxy-repo-3.png)
 
-Creating repository `docker-group`
+`docker-group` რეპოზიტორიის შექმნა
 
 Here are the most important fields that should be filled:
 - `Name: docker-group`
-- `Format: docker` (when creating the repository one should select type `docker (group)` as it has been shown)
+- `Format: docker` (რეპოზიტორიის შექმნისას, არჩევანში უნდა მოვნიშნოთ `docker (group)`)
 - `Type: group`
-- `HTTP (Create an HTTP connector at specified port. Normally used if the server is behind a secure proxy.) : 8084`
-- Proxy `Remote Storage (Location of the remote repository being proxied): https://registry-1.docker.io`
+- `HTTP (ისევ ვირჩევთ HTTP connector-ს.) : 8084`
 - Storage `Blob Store (Blob store used to store asset contents): docker-group`
-- Group `Member repositories: Members` -> `docker-priv, docker-proxy`
+- Group `Member repositories: Members` უნდა დავამატოთ `docker-priv, docker-proxy`
 
 ![Docker Group Repo 1](/images/docker-group-repo-1.png)
 ![Docker Group Repo 2](/images/docker-group-repo-2.png)
 
-Since, it is planned to use the following TCP ports `8081, 8082, 8083, 8084` the firewalld should be configured correspondingly, i.e.
+რეპოზიტორიების დამატებისას მივუთითეთ რომ გვჭირდება შემდეგი TCP პორტები `8081, 8082, 8083, 8084`, შესაბამისად გავხსნათ ეს პორტები firewalld-ის გამოყენებით,
 
 ```
 firewall-cmd --permanent --add-port={8081/tcp,8082/tcp,8083/tcp,8084/tcp}
