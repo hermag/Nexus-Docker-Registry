@@ -209,6 +209,82 @@ If `httpd` and `nexus` daemons are running without issues, we can go to the next
 
 ## Testing of the Setup
 
+In order to use the newly installed registry we need to trust the self signed certificate, below are the instructions for Ubuntu and for CentOS.
+
+### Ubuntu
+
+Creat the `nexus-docker-repo` folder for copying the certificates `sudo mkdir /usr/share/ca-certificates/test`.
+
+Copy the self signed certificate to the newly created folder `sudo cp priv.crt /usr/share/ca-certificates/test/`.
+
+Import and trust the certificate, `sudo dpkg-reconfigure ca-certificates`
+
+Select `Yes` in order to agree on trusting new certificate,
+
+![Trust cert 1](/images/add-certificate-1.png)
+
+Scroll down and select `test/ca.crt` in my case, `ca.crt` is the name of the new certificate instead of `priv.crt`.
+
+![Trust cert 2](/images/add-certificate-2.png)
+
+### CentOS
+
+Copy the `priv.crt` to `/etc/pki/ca-trust/source/anchors/` and run `update-ca-trust` it will add the new cert and update the list of trusted certificates.
+
+
+### Pull and Push Docker Images
+
+First of all make sure that docker is installed and running.
+
+Try to log in on docker registry `docker login -u admin nexus.test.net`, it should prompt for the password, which in our case would be `admin123`.
+
+```One can add dedicated user in OSS Nexus, which will have all rights on docker repositories. Dedicated user can be used for docker registry related manipulations.```
+
+If log in on docker registry was successful, one can pull the image from global docker registry
+
+```
+[root@runner ~]# docker pull nginx
+Using default tag: latest
+latest: Pulling from library/nginx
+e7bb522d92ff: Pull complete 
+0f4d7753723e: Pull complete 
+91470a14d63f: Pull complete 
+Digest: sha256:2ffc60a51c9d658594b63ef5acfac9d92f4e1550f633a3a16d898925c4e7f5a7
+Status: Downloaded newer image for nginx:latest
+```
+
+In order to push it to the registry we need to tag it accordingly
+
+```
+[root@runner ~]# docker tag nginx nexus.test.net/nginx
+[root@runner ~]# docker images
+REPOSITORY             TAG                 IMAGE ID            CREATED             SIZE
+nginx                  latest              f895b3fb9e30        3 days ago          108MB
+nexus.test.net/nginx   latest              f895b3fb9e30        3 days ago          108MB
+```
+
+now we are ready to push it
+
+```
+[root@runner ~]# docker push nexus.test.net/nginx
+The push refers to a repository [nexus.test.net/nginx]
+995f02eaa054: Layer already exists 
+938981ec0340: Layer already exists 
+2ec5c0a4cb57: Layer already exists 
+latest: digest: sha256:3eff18554e47c4177a09cea5d460526cbb4d3aff9fd1917d7b1372da1539694a size: 948
+```
+
+Finally it will end up in `docker-priv` repository:
+
+As you can see there is a `nginx:latest` package in the repository,
+
+![Docker image 1](/images/docker-image-1.png)
+
+Here are some more details.
+
+![Docker image 2](/images/docker-image-2.png)
+
+## Done
 
 [Erekle Magradze](http://magradze.web.cern.ch/magradze/)
 
